@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        img {
+            position: absolute;
+            width: 100px;
+            top: 300px;
+            left: 300px;
+            transition: transform 0.3s;
+        }
+
+        .left {
+            transform: rotateY(180deg);
+        }
+
+        .rtop {
+            transform: rotateZ(-90deg);
+        }
+
+        .ltop {
+            transform: rotateY(180deg) rotateZ(-90deg);
+        }
+
+        .rbottom {
+            transform: rotateZ(90deg);
+        }
+
+        .lbottom {
+            transform: rotateY(180deg) rotateZ(90deg);
+        }
+
+        .left-top {
+            transform: rotateY(180deg) rotateZ(-45deg);
+        }
+
+        .left-bottom {
+            transform: rotateY(180deg) rotateZ(45deg);
+        }
+
+        .right-top {
+            transform: rotateZ(-45deg);
+        }
+
+        .right-bottom {
+            transform: rotateZ(45deg);
+        }
+
+        .food {
+            position: absolute;
+            transition: none;
+        }
+    </style>
+</head>
+
+<body>
+    <img class="right" src="images/bird.gif" alt="">
+
+    <script>
+        (function () {
+            var food = document.getElementById("food");
+            var box = document.getElementsByTagName("img")[0];
+            var isL, isR, isT, isB;
+            var timer = null;
+            var speed = 4,
+                speed1 = 4 / Math.SQRT2,
+                time = 5;
+            var Finish = false;
+            var start = setInterval(function () {
+                createfood();
+                if (Finish) {
+                    clearInterval(start);
+                    start = null;
+                }
+            }, 1000);
+            window.onkeydown = function (e) {
+                e = e || window.event;
+                code = e.keyCode || e.which;
+                if (code == 37) {
+                    isL = true;
+                }
+                else if (code == 38) {
+                    isT = true;
+                }
+                else if (code == 39) {
+                    isR = true;
+                }
+                else if (code == 40) {
+                    isB = true;
+                }
+                if (!timer) {
+                    timer = setInterval(function () {
+                        if (isL) {
+                            if (isB) {
+                                box.style.left = box.offsetLeft - speed1 + "px";
+                                box.style.top = box.offsetTop + speed1 + "px";
+                                box.className = "left-bottom";
+                            } else if (isT) {
+                                box.style.left = box.offsetLeft - speed1 + "px";
+                                box.style.top = box.offsetTop - speed1 + "px";
+                                box.className = "left-top";
+                            } else {
+                                box.style.left = box.offsetLeft - speed + "px";
+                                box.className = "left";
+                            }
+                        } else if (isR) {
+                            if (isB) {
+                                box.style.left = box.offsetLeft + speed1 + "px";
+                                box.style.top = box.offsetTop + speed1 + "px";
+                                box.className = "right-bottom";
+                            } else if (isT) {
+                                box.style.left = box.offsetLeft + speed1 + "px";
+                                box.style.top = box.offsetTop - speed1 + "px";
+                                box.className = "right-top";
+                            } else {
+                                box.style.left = box.offsetLeft + speed + "px";
+                                box.className = "right";
+                            }
+                        } else if (isT) {
+                            box.style.top = box.offsetTop - speed + "px";
+                            if (box.className.slice(0, 1) == "r") {
+                                box.className = "rtop";
+                            } else if (box.className.slice(0, 1) == "l") {
+                                box.className = "ltop";
+                            }
+                        } else if (isB) {
+                            box.style.top = box.offsetTop + speed + "px";
+                            if (box.className.slice(0, 1) == "r") {
+                                box.className = "rbottom";
+                            } else if (box.className.slice(0, 1) == "l") {
+                                box.className = "lbottom";
+                            }
+                        }
+                        // if (box.offsetLeft + box.offsetWidth > food.offsetLeft
+                        //     && box.offsetTop + box.offsetHeight > food.offsetTop
+                        //     && box.offsetTop < food.offsetTop + food.offsetHeight
+                        //     && box.offsetLeft < food.offsetLeft + food.offsetWidth) {
+                        //     box.style.width = box.offsetWidth + 5 + "px";
+                        //     createfood();
+                        // }
+                    }, time);
+                }
+
+                if (box.offsetTop < -box.offsetHeight) {
+                    box.style.top = window.innerHeight + "px";
+                }
+                if (box.offsetTop > window.innerHeight) {
+                    box.style.top = -box.offsetHeight + "px";
+                }
+                if (box.offsetLeft < -box.offsetWidth) {
+                    box.style.left = window.innerWidth + "px";
+                }
+                if (box.offsetLeft > window.innerWidth) {
+                    box.style.left = -box.offsetWidth + "px";
+                }
+            }
+            window.onkeyup = function (e) {
+                e = e || window.event;
+                code = e.keyCode || e.which;
+                if (code == 37) {
+                    isL = false;
+                }
+                else if (code == 38) {
+                    isT = false;
+                }
+                else if (code == 39) {
+                    isR = false;
+                }
+                else if (code == 40) {
+                    isB = false;
+                }
+                if (!isL && !isT && !isR && !isB) {
+                    clearInterval(timer);
+                    timer = null;
+                }
+            }
+
+            function createfood() {
+                var food = document.createElement("img");
+                food.className = "food";
+                food.src = "images/bird.gif";
+                document.body.appendChild(food);
+                food.style.width = getRandom(50, 200) + "px";
+                var direction = getRandom(0, 1);
+                var speed = getRandom(1, 4);
+                food.style.top = getRandom(50, window.innerHeight - 100) + "px";
+                if (direction == 0) {
+                    food.style.left = -food.offsetWidth + "px";
+                    food.classList.add("right");
+                } else {
+                    food.style.left = window.innerWidth + "px";
+                    food.classList.add("left");
+                }
+                var foodMoveTimer = setInterval(function () {
+                    if (Finish) {
+                        clearInterval(foodMoveTimer);
+                        foodMoveTimer = null;
+                        return;
+                    }
+                    if (direction == 0) {
+                        food.style.left = food.offsetLeft + speed + "px";
+                        if (food.offsetLeft > window.innerWidth) {
+                            document.body.removeChild(food);
+                            clearInterval(foodMoveTimer);
+                            foodMoveTimer = null;
+                            return;
+                        }
+                    } else {
+                        food.style.left = food.offsetLeft - speed + "px";
+                        if (food.offsetLeft < -food.offsetWidth) {
+                            document.body.removeChild(food);
+                            clearInterval(foodMoveTimer);
+                            foodMoveTimer = null;
+                            return;
+                        }
+                    }
+                    if (box.offsetLeft + box.offsetWidth > food.offsetLeft
+                        && box.offsetTop + box.offsetHeight > food.offsetTop
+                        && box.offsetTop < food.offsetTop + food.offsetHeight
+                        && box.offsetLeft < food.offsetLeft + food.offsetWidth) {
+                        if (box.offsetWidth < food.offsetWidth) {
+                            Finish = true;
+                            alert("游戏结束,得分" + (box.offsetWidth - 100));
+                            document.body.removeChild(box);
+                        } else {
+                            box.style.width = box.offsetWidth + 1 + "px";
+                            document.body.removeChild(food);
+                            if (box.offsetWidth >= 500) {
+                                alert("游戏结束,恭喜您已通关!");
+                                Finish = true;
+                            }
+                        }
+                        clearInterval(foodMoveTimer);
+                        foodMoveTimer = null;
+                    }
+                }, time)
+            }
+            function getRandom(min, max) {
+                return min + Math.floor(Math.random() * (max - min + 1));
+            }
+        })()
+    </script>
+</body>
+
+</html>
